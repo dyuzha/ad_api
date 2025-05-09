@@ -78,3 +78,20 @@ def get_test():
     """Проверяет соединение"""
     logger.info("Success connection")
     return {"message": "Success connection"}
+
+
+@app.get("/get_user_mail")
+def get_user_mail(login: str):
+    try:
+        with LDAPService(ldap_config) as ldap_conn:
+
+            success = ldap_conn.get_user(login=login, cn="dc=krd")
+            if success is None:
+                raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя {login}")
+            if success is False:
+                return {"status": "success", "mail":"None"}
+            return {"status": "success", "mail":success.mail.value}
+
+    except Exception as e:
+        logger.error(f"Error processing request: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
