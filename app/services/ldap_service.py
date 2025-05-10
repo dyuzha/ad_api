@@ -121,8 +121,8 @@ class LDAPService:
             raise RuntimeError("LDAP connection is not established")
         try:
             self.connection.search(
-                search_filter=user.sAMAccountName,
-                search_base=user.ou,
+                search_filter=f'(sAMAccountName = {user.sAMAccountName})',
+                search_base=user.dn,
                 attributes=['*'],
             )
             user = self.connection.entries[0]
