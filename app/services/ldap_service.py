@@ -126,6 +126,21 @@ class LDAPService:
                 attributes=['*'],
             )
 
+            user = self.connection.entries[0]
+            if len(self.connection.entries) != 0:
+                logger.info(f"Successfully search user: {user}")
+                return user
+            else:
+                return False
+
+        except LDAPException as e:
+            logger.error(f"LDAP error: {e}")
+            return False
+
+    def get_test_user(self):
+        if not self.connection or self.connection.closed:
+            raise RuntimeError("LDAP connection is not established")
+        try:
             self.connection.search(
                 search_filter='(sAMAccountName=dyuzhev_mn)',
                 search_base='dc=art-t,dc=ru',
