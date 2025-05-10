@@ -4,7 +4,7 @@ from ldap3.core.exceptions import LDAPException
 from typing import Optional, Type
 from types import TracebackType
 from config.ldap_config import LDAPConfig
-from core.models import UserRegistration, UserEditor
+from core.models import UserRegistration, UserEditor, UserGetion
 
 logger = logging.getLogger(__name__)
 
@@ -115,20 +115,19 @@ class LDAPService:
         """Перемещает пользователя"""
         pass
 
-
-    def get_user(self, login, cn):
-        """Возвращает user по логину, если пользователь не найден, возвращает False"""
+    def get_user(self, user: UserGetion):
+        """Возвращает объект user по логину, если пользователь не найден, возвращает False"""
         if not self.connection or self.connection.closed:
             raise RuntimeError("LDAP connection is not established")
         try:
             self.connection.search(
-                search_filter=login,
-                search_base=cn,
+                search_filter=user.sAMAccountName,
+                search_base=user.ou,
                 attributes=['*'],
             )
             user = self.connection.entries[0]
             if len(self.connection.entries) != 0:
-                logger.info(f"Successfully search user: {user.user_dn}")
+                logger.info(f"Successfully search user: {user}")
                 return user
             else:
                 return False

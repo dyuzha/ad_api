@@ -72,9 +72,12 @@ class UserEditor(BaseModel):
     """Форма для редактирования пользователя """
     sAMAccountName: str = Field(alias="login", description="Логин (например: login_ad)")
 
+class UserGetion(BaseModel):
+    sAMAccountName: str = Field(alias="login", description="Логин (например: login_ad)")
+    ou: str = Field(exclude=True, description="OU из Active Directory (например: ou=krd,ou=Проф ИТ,ou=Пользователи)")
+
+
 
 class UserToTrash(BaseModel):
     pass
 
-class UserGetion(BaseModel):
-    pass
