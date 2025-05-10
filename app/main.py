@@ -97,7 +97,7 @@ def get_user_mail(user: UserGetion):
         return {"status": "success", "mail":success.mail.value}
 
 @app.get("/get_test_user")
-def get_test():
+def get_test_user():
     with LDAPService(ldap_config) as ldap_conn:
         success = ldap_conn.get_test_user()
         if success is None:
