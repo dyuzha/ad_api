@@ -115,17 +115,16 @@ class LDAPService:
         """Перемещает пользователя"""
         pass
 
-    # def get_user(self, user: UserGetion):
-    def get_user(self):
+    def get_user(self, user: UserGetion):
         """Возвращает объект user по логину, если пользователь не найден, возвращает False"""
         if not self.connection or self.connection.closed:
             raise RuntimeError("LDAP connection is not established")
         try:
-            # self.connection.search(
-            #     search_filter=f'(sAMAccountName = {user.sAMAccountName})',
-            #     search_base=user.dn,
-            #     attributes=['*'],
-            # )
+            self.connection.search(
+                search_filter=f'(sAMAccountName = {user.sAMAccountName})',
+                search_base=user.dn,
+                attributes=['*'],
+            )
 
             self.connection.search(
                 search_filter='(sAMAccountName=dyuzhev_mn)',

@@ -87,11 +87,11 @@ def get_test():
 
 @app.post("/get_user_mail")
 @handle_ldap_errors
-def get_user_mail():
+def get_user_mail(user: UserGetion):
     with LDAPService(ldap_config) as ldap_conn:
-        success = ldap_conn.get_user()
+        success = ldap_conn.get_user(user)
         if success is None:
             raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя {login}")
         if success is False:
             return {"status": "success", "mail":"None"}
-        return {"status": "success", "mail":"success"}
+        return {"status": "success", "mail":success.mail.value}
