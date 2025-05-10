@@ -14,5 +14,4 @@ echo " --- docker build -t u_manager $SCRIPT_DIR/.."
 docker build -t u_manager $SCRIPT_DIR/..
 
 # Запускаем контейнер
-echo " --- docker run -d -p 82:8000 --name um u_manager"
-docker run -d -p 82:8000 --name um u_manager
+echo " --- docker run -d -p 82:8000 --name aac ad_api"

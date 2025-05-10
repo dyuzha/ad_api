@@ -1,18 +1,8 @@
-curl -X POST "http://localhost:80/add_user" \
+curl -X POST "http://pgadmin.it4prof.ru:82/get_user_mail" \
      -H "Content-Type: application/json" \
      -d '{
-           "name": "Андрей",
-           "surname": "Андреев",
-           "optname": "Андреевич",
-           "password": "Change_me_123",
-           "mail_domain": "it4prof.ru",
-           "domain": "art-t.ru",
+           "login": "dyuzhev_mn",
            "ou": "OU=Пользователи,OU=Проф ИТ,OU=krd",
-           "title": "Title",
-           "company": "Проф ИТ",
-           "mobile": "+7-981-402-77-88",
-           "description": "Descr",
-           "department": "Depart"
          }'
 
 
