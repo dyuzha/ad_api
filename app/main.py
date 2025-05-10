@@ -3,7 +3,7 @@ from core.logging import setup_logging
 from services.ldap_service import LDAPService
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from core.models import UserRegistration, UserEditor, UserToTrash, UserGetion
+from core.models import UserRegistration, UserGetion
 from config.setting import settings
 from config.ldap_config import ldap_config
 from functools import wraps
