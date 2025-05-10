@@ -36,7 +36,7 @@ app.add_middleware(
 
 @app.post("/register")
 @handle_ldap_errors
-async def register_user(user: UserRegistration, ldap_conn: LDAPService):
+async def register_user(user: UserRegistration):
     """Регистрирует нового пользователя"""
     with LDAPService(ldap_config) as ldap_conn:
 
