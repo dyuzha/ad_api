@@ -4,7 +4,7 @@ from ldap3.core.exceptions import LDAPException
 from typing import Optional, Type
 from types import TracebackType
 from config.ldap_config import LDAPConfig
-from core.models import UserRegistration, UserEditor, UserGetion
+from core.models import UserRegistration, UserGetion
 
 logger = logging.getLogger(__name__)
 
@@ -39,26 +39,6 @@ class LDAPService:
 
         return exception_type is None
 
-    def get_user_dn(self, login, cn):
-        """Возвращает user_dn по логину, если пользователь не найден, возвращает False"""
-        if not self.connection or self.connection.closed:
-            raise RuntimeError("LDAP connection is not established")
-        try:
-            self.connection.search(
-                search_filter=login,
-                search_base=cn,
-                attributes=['*'],
-            )
-            user_dn = self.connection.entries[0].entry_dn
-            if len(self.connection.entries) != 0:
-                logger.info(f"Successfully search user: {user_dn}")
-                return user_dn
-            else:
-                return False
-
-        except LDAPException as e:
-            logger.error(f"LDAP error: {e}")
-            return False
 
     def reg_user(self, user:UserRegistration):
         """Создает пользователя LDAP"""
@@ -93,9 +73,6 @@ class LDAPService:
             logger.error(f"LDAP error: {e}")
             return False
 
-    def update_user(self, UserEditor):
-        pass
-
 
     def password_update(self, user):
         """Обновляет пароль пользователя"""
@@ -121,17 +98,18 @@ class LDAPService:
             raise RuntimeError("LDAP connection is not established")
         try:
             self.connection.search(
-                search_filter=f'(sAMAccountName = {user.sAMAccountName})',
+                search_filter=f'(sAMAccountName={user.sAMAccountName})',
                 search_base=user.dn,
-                attributes=['*'],
+                attributes=['mail, sAMAccountName'],
             )
 
-            user = self.connection.entries[0]
             if len(self.connection.entries) != 0:
-                logger.info(f"Successfully search user: {user}")
-                return user
+                finded_user = self.connection.entries[0]
+                logger.info(f"Successfully search user: {user.sAMAccountName}")
+                return finded_user
             else:
-                return False
+                logger.info(f"Successfully search user: {user.sAMAccountName}")
+                return None
 
         except LDAPException as e:
             logger.error(f"LDAP error: {e}")
@@ -144,14 +122,16 @@ class LDAPService:
             self.connection.search(
                 search_filter='(sAMAccountName=dyuzhev_mn)',
                 search_base='dc=art-t,dc=ru',
-                attributes=['*']
+                attributes=['mail, sAMAccountName']
             )
-            user = self.connection.entries[0]
+
             if len(self.connection.entries) != 0:
-                logger.info(f"Successfully search user: {user}")
-                return user
+                finded_user = self.connection.entries[0]
+                logger.info("Successfully search user")
+                return finded_user
             else:
-                return False
+                logger.info("Successfully search user")
+                return None
 
         except LDAPException as e:
             logger.error(f"LDAP error: {e}")

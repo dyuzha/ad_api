@@ -1,7 +1,7 @@
 import logging
 from core.logging import setup_logging
 from services.ldap_service import LDAPService
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from core.models import UserRegistration, UserEditor, UserToTrash, UserGetion
 from config.setting import settings
@@ -58,26 +58,6 @@ async def register_user(user: UserRegistration):
     return {"status": "success", "login": user.sAMAccountName}
 
 
-@app.post("/edit")
-@handle_ldap_errors
-async def edit_user(user: UserEditor):
-    """Изменяет существующего пользователя"""
-    with LDAPService(ldap_config) as ldap_conn:
-
-        # Добавляем пароль пользователю
-        success = ldap_conn.password_update(user=user)
-        if not success:
-            raise HTTPException(status_code=500, detail=f"Failed to change password for {user.cn[:3]}")
-
-    return {"status": "success", "login": user.sAMAccountName}
-
-
-@app.post("/to_trash_user")
-async def to_trash_user(user: UserToTrash):
-    """Перемещает пользователя в корзину и очищает группы"""
-    pass
-
-
 @app.get("/test_connection")
 def get_test():
     """Проверяет соединение"""
@@ -89,19 +69,23 @@ def get_test():
 @handle_ldap_errors
 def get_user_mail(user: UserGetion):
     with LDAPService(ldap_config) as ldap_conn:
-        success = ldap_conn.get_user(user)
-        if success is None:
-            raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя {login}")
+        success = ldap_conn.get_user(user=user)
         if success is False:
+            raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя: {user.sAMAccountName}")
+        elif success is None:
             return {"status": "success", "mail":"None"}
-        return {"status": "success", "mail":success.mail.value}
+        else:
+            return {"status": "success", "mail":success.mail.value}
 
-@app.get("/get_test_user")
+
+@app.get("/test/get_user")
+@handle_ldap_errors
 def get_test_user():
     with LDAPService(ldap_config) as ldap_conn:
         success = ldap_conn.get_test_user()
         if success is None:
             raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя ")
-        if success is False:
+        elif success is False:
             return {"status": "success", "mail":"None"}
-    return {"status": "success", "mail":"success"}
+        else:
+            return {"status": "success", "mail":"success"}

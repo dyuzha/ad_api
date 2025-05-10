@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 from transliterate import translit
-from pydantic import BaseModel, EncodedStr, computed_field, Field
+from pydantic import BaseModel, computed_field, Field
 
 logger = logging.getLogger(__name__)
 
@@ -68,10 +68,6 @@ class UserRegistration(BaseModel):
         return f"\"{self.password}\"".encode('utf-16-le')
 
 
-class UserEditor(BaseModel):
-    """Форма для редактирования пользователя """
-    sAMAccountName: str = Field(alias="login", description="Логин (например: login_ad)")
-
 class UserGetion(BaseModel):
     sAMAccountName: str = Field(alias="login", description="Логин (например: login_ad)")
     ou: str = Field(exclude=True, description="OU из Active Directory (например: ou=krd,ou=Проф ИТ,ou=Пользователи)")
@@ -87,7 +83,6 @@ class UserGetion(BaseModel):
         return f"{self.ou},{self.dc}"
 
 
-
-class UserToTrash(BaseModel):
-    pass
-
+class UserEditor(BaseModel):
+    """Форма для редактирования пользователя """
+    sAMAccountName: str = Field(alias="login", description="Логин (например: login_ad)")
