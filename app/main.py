@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.models import UserRegistration, UserEditor, UserToTrash
 from config.setting import settings
 from config.ldap_config import ldap_config
+from functools import wraps
+
 
 # Инициализация логирования
 setup_logging()
@@ -14,6 +16,17 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title=settings.app_name)
 
+def handle_ldap_errors(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        try:
+            result = await func(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error processing request: {e}")
+            raise HTTPException(status_code=400, detail=str())
+        return result
+    return wrapper
+
 # Разрешение запросов
 app.add_middleware(
     CORSMiddleware,
@@ -21,33 +34,55 @@ app.add_middleware(
     allow_methods=["POST"],
     )
 
-
 @app.post("/register")
-async def register_user(user: UserRegistration):
+@handle_ldap_errors
+async def register_user(user: UserRegistration, ldap_conn: LDAPService):
     """Регистрирует нового пользователя"""
-    try:
-        with LDAPService(ldap_config) as ldap_conn:
-            # Создаем пользователя
-            success = ldap_conn.reg_user(user=user)
-            if not success:
-                raise HTTPException(status_code=500, detail="Failed to create user in LDAP")
+    with LDAPService(ldap_config) as ldap_conn:
 
-            # Изменяем мод пользователя
-            success = ldap_conn.change_mode(user=user)
-            if not success:
-                raise HTTPException(status_code=500, detail=f"Failed to change mode for {user.cn[:3]}")
+        # Создаем пользователя
+        success = ldap_conn.reg_user(user=user)
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to create user in LDAP")
 
-            # Добавляем пароль пользователю
-            success = ldap_conn.password_update(user=user)
-            if not success:
-                raise HTTPException(status_code=500, detail=f"Failed to change password for {user.cn[:3]}")
+        # Изменяем мод пользователя
+        success = ldap_conn.change_mode(user=user)
+        if not success:
+            raise HTTPException(status_code=500, detail=f"Failed to change mode for {user.cn[:3]}")
 
-        return {"status": "success", "login": user.sAMAccountName}
+        # Добавляем пароль пользователю
+        success = ldap_conn.password_update(user=user)
+        if not success:
+            raise HTTPException(status_code=500, detail=f"Failed to change password for {user.cn[:3]}")
 
-    except Exception as e:
-        logger.error(f"Error processing request: {e}")
-        raise HTTPException(status_code=400, detail=str(e))
+    return {"status": "success", "login": user.sAMAccountName}
 
+
+# @app.post("/register")
+# @handle_ldap_errors(ldap_config)
+#     """Регистрирует нового пользователя"""
+#     try:
+#             # Создаем пользователя
+#             success = ldap_conn.reg_user(user=user)
+#             if not success:
+#                 raise HTTPException(status_code=500, detail="Failed to create user in LDAP")
+#
+#             # Изменяем мод пользователя
+#             success = ldap_conn.change_mode(user=user)
+#             if not success:
+#                 raise HTTPException(status_code=500, detail=f"Failed to change mode for {user.cn[:3]}")
+#
+#             # Добавляем пароль пользователю
+#             success = ldap_conn.password_update(user=user)
+#             if not success:
+#                 raise HTTPException(status_code=500, detail=f"Failed to change password for {user.cn[:3]}")
+#
+#         return {"status": "success", "login": user.sAMAccountName}
+#
+#     except Exception as e:
+#         logger.error(f"Error processing request: {e}")
+#         raise HTTPException(status_code=400, detail=str(e))
+#
 
 @app.post("/edit")
 async def edit_user(user: UserEditor):
