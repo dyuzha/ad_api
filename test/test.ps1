@@ -3,14 +3,14 @@ $DOCERFILE_DIR = (Resolve-Path "$PSScriptRoot\..").Path
 
 # Останавливаем и удаляем контейнер, если он существует
 echo "--- Stopped container..."
-docker stop um
+docker stop aac
 echo "--- Removed container..."
-docker rm um
+docker rm aac
 
 # Создаем докер образ
-echo " --- docker build -t u_manager $DOCERFILE_DIR"
-docker build -t u_manager $PSScriptRoot\..
+echo " --- docker build -t ad_api $DOCERFILE_DIR"
+docker build -t ad_api $PSScriptRoot\..
 
 # Запускаем контейнер
-echo " --- docker run -d -p 82:8000 --name um u_manager"
-docker run -d -p 82:8000 --name um u_manager
+echo " --- docker run -d -p 82:8000 --name aac ad_api"
+docker run -d -p 82:8000 --name aac ad_api
