@@ -69,7 +69,7 @@ class UserRegistration(BaseModel):
 
 
 class UserGetion(BaseModel):
-    sAMAccountName: str = Field(alias="login", description="Логин (например: login_ad)")
+    sAMAccountName: str = Field(description="Логин (например: login_ad)")
     ou: str = Field(description="OU из Active Directory (например: ou=krd,ou=Проф ИТ,ou=Пользователи)")
     domain: str = Field(description="Домен Active Directory (например: art-t.ru)")
 
