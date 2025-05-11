@@ -115,7 +115,7 @@ class LDAPService:
     #         return False
 
 
-    def get_user(self, user: UserGetion, *attributes) -> dict | bool | None:
+    def get_user(self, user: UserGetion, *attributes):
         """
         Выполняет поиск пользователя по логину (sAMAccountName)
         Возвращает словарь:
