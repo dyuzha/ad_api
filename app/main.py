@@ -18,6 +18,7 @@ logger.info("-- Application started --")
 
 app = FastAPI(title=settings.app_name)
 
+
 def handle_ldap_errors(func):
     @wraps(func)
     async def wrapper(*args, **kwargs):
@@ -29,12 +30,14 @@ def handle_ldap_errors(func):
         return result
     return wrapper
 
+
 # Разрешение запросов
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins,
     allow_methods=["POST"],
     )
+
 
 @app.post("/register")
 @handle_ldap_errors
@@ -45,17 +48,26 @@ async def register_user(user: UserRegistration):
         # Создаем пользователя
         success = ldap_conn.reg_user(user=user)
         if not success:
-            raise HTTPException(status_code=500, detail="Failed to create user in LDAP")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to create user in LDAP"
+            )
 
         # Изменяем мод пользователя
         success = ldap_conn.change_mode(user=user)
         if not success:
-            raise HTTPException(status_code=500, detail=f"Failed to change mode for {user.cn[:3]}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to change mode for {user.cn[:3]}"
+            )
 
         # Добавляем пароль пользователю
         success = ldap_conn.password_update(user=user)
         if not success:
-            raise HTTPException(status_code=500, detail=f"Failed to change password for {user.cn[:3]}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to change password for {user.cn[:3]}"
+            )
 
     return {"status": "success", "login": user.sAMAccountName}
 
@@ -69,8 +81,9 @@ def get_test():
 
 @app.post("/get_user/mail")
 def get_user_mail(user: UserGetion):
+    """Возвращает запись mail пользователя по логину"""
     try:
-        logger.debug(f"Received request for user: {user.model_dump()}")  # Логируем входящие данные
+        logger.debug(f"Received request for user: {user.model_dump()}")
         with LDAPService(ldap_config) as ldap_conn:
             user_data = ldap_conn.get_user(user, "mail")
 

@@ -6,10 +6,12 @@ from types import TracebackType
 from config.ldap_config import LDAPConfig
 from core.models import UserRegistration, UserGetion
 
+
 logger = logging.getLogger(__name__)
 
 
 class LDAPService:
+    """Класс для взаимодействия в Active Directory"""
     def __init__(self, config: LDAPConfig):
         self.config = config
         self.connection: Optional[Connection] = None
@@ -59,13 +61,17 @@ class LDAPService:
             logger.error(f"LDAP error: {e}")
             return False
 
+
     def change_mode(self, user):
         """Изменяет пользователя LDAP"""
         if not self.connection or self.connection.closed:
             raise RuntimeError("LDAP connection is not established")
 
         try:
-            self.connection.modify(user.dn, {'userAccountControl': [(MODIFY_REPLACE, [66048])]})
+            self.connection.modify(
+                user.dn,
+                {'userAccountControl': [(MODIFY_REPLACE, [66048])]}
+            )
             logger.info(f"Successfully change mode for user {user.sAMAccountName}")
             return True
 
@@ -80,7 +86,9 @@ class LDAPService:
             raise RuntimeError("LDAP connection is not established")
 
         try:
-            self.connection.modify(user.dn, {'unicodePwd': [(MODIFY_REPLACE, [user.unicodePwd])]})
+            self.connection.modify(user.dn, {
+                'unicodePwd': [(MODIFY_REPLACE, [user.unicodePwd])]
+                })
             logger.info(f"Successfully password update for user {user.sAMAccountName}")
             return True
 
@@ -88,31 +96,10 @@ class LDAPService:
             logger.error(f"LDAP error: {e}")
             return False
 
-    def move(self, user):
+
+    def move(self, user: UserGetion):
         """Перемещает пользователя"""
         pass
-
-    # def get_user(self, user: UserGetion):
-    #     if not self.connection or self.connection.closed:
-    #         raise RuntimeError("LDAP connection is not established")
-    #     try:
-    #         self.connection.search(
-    #             search_filter=f'(sAMAccountName={user.sAMAccountName})',
-    #             search_base=user.dn,
-    #             attributes=['mail, sAMAccountName'],
-    #         )
-    #
-    #         if len(self.connection.entries) != 0:
-    #             finded_user = self.connection.entries[0]
-    #             logger.info(f"Successfully search user: {user.sAMAccountName}")
-    #             return finded_user
-    #         else:
-    #             logger.info(f"Successfully search user: {user.sAMAccountName}")
-    #             return None
-    #
-    #     except LDAPException as e:
-    #         logger.error(f"LDAP error: {e}")
-    #         return False
 
 
     def get_user(self, user: UserGetion, *attributes):
@@ -152,11 +139,12 @@ class LDAPService:
             return False
 
         except Exception as e:
-            logger.error(f"Неизвестная ошибка: {e}")
+            logger.error(f"Unexpected error: {e}")
             return False
 
 
     def get_test_user(self):
+        """Тестовая функция"""
         if not self.connection or self.connection.closed:
             raise RuntimeError("LDAP connection is not established")
         try:
@@ -185,5 +173,5 @@ class LDAPService:
             return False
 
         except Exception as e:
-            logger.error(f"Неизвестная ошибка: {e}")
+            logger.error(f"Unexpected error: {e}")
             return False

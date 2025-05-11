@@ -3,6 +3,7 @@ from typing import Optional
 from transliterate import translit
 from pydantic import BaseModel, computed_field, Field
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +31,8 @@ class UserRegistration(BaseModel):
             name_trans = translit(self.givenName, "ru", reversed=True)
             surname_trans = translit(self.sn, "ru", reversed=True)
             optname_trans = translit(self.optname, "ru", reversed=True)
-            return f"{surname_trans.lower()}_{name_trans[:1].lower()}{optname_trans[:1].lower()}"
+            return f"{surname_trans.lower()}_{name_trans[:1].
+                                        lower()}{optname_trans[:1].lower()}"
         except Exception as e:
             logger.error(f"Transliteration error: {e}")
             raise
@@ -48,16 +50,16 @@ class UserRegistration(BaseModel):
         return f"{self.sAMAccountName}@{self.mail_domain}"
 
     @property
-    def cn(self):
+    def cn(self) -> str:
         return f"CN={self.displayName}"
 
     @property
-    def dc(self):
+    def dc(self) -> str:
         parts = [part for part in self.domain.split('.') if part]
         return "".join(f",dc={part.lower()}" for part in parts)[1:]
 
     @property
-    def dn(self):
+    def dn(self) -> str:
         return f"{self.cn},{self.ou},{self.dc}"
 
     @property
@@ -69,12 +71,13 @@ class UserRegistration(BaseModel):
 
 
 class UserGetion(BaseModel):
+    """Форма для получения записи пользователя"""
     sAMAccountName: str = Field(description="Логин (например: login_ad)")
     ou: str = Field(description="OU из Active Directory (например: ou=krd,ou=Проф ИТ,ou=Пользователи)")
     domain: str = Field(description="Домен Active Directory (например: art-t.ru)")
 
     @property
-    def dn(self):
+    def dn(self) -> str:
         return f"{self.ou},dc={self.domain.replace('.', ',dc=')}"
 
 

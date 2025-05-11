@@ -1,8 +1,10 @@
 import logging
-from pydantic import Field, SecretStr
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 logger = logging.getLogger(__name__)
+
 
 class LDAPConfig(BaseSettings):
     """
