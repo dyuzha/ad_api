@@ -129,7 +129,7 @@ class LDAPService:
         try:
             self.connection.search(
                 search_filter=f'(sAMAccountName={user.sAMAccountName})',
-                search_base=user.dc,
+                search_base=user.dn,
                 attributes=attributes
             )
 
