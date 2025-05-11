@@ -13,6 +13,7 @@ from functools import wraps
 # Инициализация логирования
 setup_logging()
 logger = logging.getLogger(__name__)
+logger.info("Application started - TEST MESSAGE")
 
 
 app = FastAPI(title=settings.app_name)
