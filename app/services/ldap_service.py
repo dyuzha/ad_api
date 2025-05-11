@@ -130,7 +130,7 @@ class LDAPService:
             self.connection.search(
                 search_filter=f'(sAMAccountName={user.sAMAccountName})',
                 search_base=user.dn,
-                attributes=["mail"]
+                attributes=attributes
             )
 
             if not self.connection.entries:
