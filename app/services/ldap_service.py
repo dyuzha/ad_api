@@ -133,11 +133,17 @@ class LDAPService:
             finded_user = self.connection.entries[0]
             logger.info("Successfully found user")
 
-            return {
+            user_data = {
                 "login": finded_user.sAMAccountName.value,
                 "mail": finded_user.mail.value if hasattr(finded_user, 'mail') else None
             }
+            logger.info(f"Founded user: {user_data}")
+            return user_data
 
         except LDAPException as e:
             logger.error(f"LDAP error: {e}")
+            return False
+
+        except Exception as e:
+            logger.error(f"Неизвестная ошибка: {e}")
             return False

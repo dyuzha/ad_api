@@ -3,6 +3,7 @@ from core.logging import setup_logging
 from services.ldap_service import LDAPService
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from core.models import UserRegistration, UserGetion
 from config.setting import settings
 from config.ldap_config import ldap_config
@@ -81,8 +82,21 @@ def get_user_mail(user: UserGetion):
 @app.get("/test/get_user")
 @handle_ldap_errors
 def get_test_user():
-    with LDAPService(ldap_config) as ldap_conn:
-        user_data = ldap_conn.get_test_user()
-        if user_data is None:
-            return {"detail": "Пользователь не найден или ошибка поиска"}
-        return user_data
+    try:
+        with LDAPService(ldap_config) as ldap_conn:
+            user_data = ldap_conn.get_test_user()
+
+            if not user_data:
+                return JSONResponse(
+                    status_code=404,
+                    content={"detal": "User not found in Active Directory"}
+                )
+
+            return { "status": "success", "data": user_data }
+
+    except Exception as e:
+        logger.error(f"API error: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail":"Internal server error"}
+        )
