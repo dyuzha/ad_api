@@ -127,10 +127,11 @@ class LDAPService:
             finded_user = self.connection.entries[0]
             logger.info("Successfully found user")
 
-            user_data = {
-                "login": user.sAMAccountName,
-                "mail": finded_user.mail.value if hasattr(finded_user, 'mail') else None
-            }
+
+            user_data = {attr: getattr(finded_user, attr).value for attr in attributes}
+                # "mail": finded_user.mail.value if hasattr(finded_user, 'mail') else None
+            user_data["login"] = user.sAMAccountName
+
             logger.info(f"Founded user: {user_data}")
             return user_data
 
