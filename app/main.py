@@ -82,10 +82,7 @@ def get_user_mail(user: UserGetion):
 @handle_ldap_errors
 def get_test_user():
     with LDAPService(ldap_config) as ldap_conn:
-        success = ldap_conn.get_test_user()
-        if success is None:
-            raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя ")
-        elif success is False:
-            return {"status": "success", "mail":"None"}
-        else:
-            return {"status": "success", "mail":"success"}
+        user_data = ldap_conn.get_test_user()
+        if user_data is None:
+            return {"detail": "Пользователь не найден или ошибка поиска"}
+        return user_data
