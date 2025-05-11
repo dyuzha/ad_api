@@ -102,7 +102,7 @@ class LDAPService:
         pass
 
 
-    def get_user(self, user: UserGetion, *attributes):
+    def get_user_info(self, user: UserGetion, *attributes):
         """
         Выполняет поиск пользователя по логину (sAMAccountName)
         Возвращает словарь:

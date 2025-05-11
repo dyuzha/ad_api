@@ -85,7 +85,7 @@ def get_user_mail(user: UserGetion):
     try:
         logger.debug(f"Received request for user: {user.model_dump()}")
         with LDAPService(ldap_config) as ldap_conn:
-            user_data = ldap_conn.get_user(user, "mail")
+            user_data = ldap_conn.get_user_info(user, "mail")
 
             if not user_data:
                 return JSONResponse(
