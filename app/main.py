@@ -80,7 +80,6 @@ def get_user_mail(user: UserGetion):
 
 
 @app.get("/test/get_user")
-@handle_ldap_errors
 def get_test_user():
     try:
         with LDAPService(ldap_config) as ldap_conn:
