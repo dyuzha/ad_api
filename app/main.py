@@ -83,7 +83,7 @@ def get_test():
 def get_user_mail(user: UserGetion):
     try:
         with LDAPService(ldap_config) as ldap_conn:
-            user_data = ldap_conn.get_user(user, "mail")
+            user_data = ldap_conn.get_user(user)
 
             if not user_data:
                 return JSONResponse(
