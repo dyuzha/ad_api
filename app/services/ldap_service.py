@@ -92,27 +92,67 @@ class LDAPService:
         """Перемещает пользователя"""
         pass
 
-    def get_user(self, user: UserGetion):
-        """Возвращает объект user по логину, если пользователь не найден, возвращает False"""
+    # def get_user(self, user: UserGetion):
+    #     if not self.connection or self.connection.closed:
+    #         raise RuntimeError("LDAP connection is not established")
+    #     try:
+    #         self.connection.search(
+    #             search_filter=f'(sAMAccountName={user.sAMAccountName})',
+    #             search_base=user.dn,
+    #             attributes=['mail, sAMAccountName'],
+    #         )
+    #
+    #         if len(self.connection.entries) != 0:
+    #             finded_user = self.connection.entries[0]
+    #             logger.info(f"Successfully search user: {user.sAMAccountName}")
+    #             return finded_user
+    #         else:
+    #             logger.info(f"Successfully search user: {user.sAMAccountName}")
+    #             return None
+    #
+    #     except LDAPException as e:
+    #         logger.error(f"LDAP error: {e}")
+    #         return False
+
+
+    def get_user(self, user: UserGetion, *attributes) -> dict | bool | None:
+        """
+        Выполняет поиск пользователя по логину (sAMAccountName)
+        Возвращает словарь:
+            {"login": ..., "attr1": "val1", "attr2": "val2", ..., "attrN": "valN"}
+        Если пользователь не найден, возвращает None
+        В случае ошибки возвращает False
+        """
+
         if not self.connection or self.connection.closed:
             raise RuntimeError("LDAP connection is not established")
         try:
             self.connection.search(
                 search_filter=f'(sAMAccountName={user.sAMAccountName})',
-                search_base=user.dn,
-                attributes=['mail, sAMAccountName'],
+                search_base=user.dc,
+                attributes=attributes
             )
 
-            if len(self.connection.entries) != 0:
-                finded_user = self.connection.entries[0]
-                logger.info(f"Successfully search user: {user.sAMAccountName}")
-                return finded_user
-            else:
-                logger.info(f"Successfully search user: {user.sAMAccountName}")
+            if not self.connection.entries:
+                logger.info("User not found")
                 return None
+
+            finded_user = self.connection.entries[0]
+            logger.info("Successfully found user")
+
+            user_data = {
+                "login": user.sAMAccountName,
+                "mail": finded_user.mail.value if hasattr(finded_user, 'mail') else None
+            }
+            logger.info(f"Founded user: {user_data}")
+            return user_data
 
         except LDAPException as e:
             logger.error(f"LDAP error: {e}")
+            return False
+
+        except Exception as e:
+            logger.error(f"Неизвестная ошибка: {e}")
             return False
 
 

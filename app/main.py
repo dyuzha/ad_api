@@ -66,17 +66,39 @@ def get_test():
     return {"message": "Success connection"}
 
 
-@app.post("/get_user_mail")
-@handle_ldap_errors
+# @app.post("/get_user_mail")
+# @handle_ldap_errors
+# def get_user_mail(user: UserGetion):
+#     with LDAPService(ldap_config) as ldap_conn:
+#         success = ldap_conn.get_user(user=user)
+#         if success is False:
+#             raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя: {user.sAMAccountName}")
+#         elif success is None:
+#             return {"status": "success", "mail":"None"}
+#         else:
+#             return {"status": "success", "mail":success.mail.value}
+
+
+@app.post("/get_user/mail")
 def get_user_mail(user: UserGetion):
-    with LDAPService(ldap_config) as ldap_conn:
-        success = ldap_conn.get_user(user=user)
-        if success is False:
-            raise HTTPException(status_code=500, detail=f"Ошибка во время поиска пользователя: {user.sAMAccountName}")
-        elif success is None:
-            return {"status": "success", "mail":"None"}
-        else:
-            return {"status": "success", "mail":success.mail.value}
+    try:
+        with LDAPService(ldap_config) as ldap_conn:
+            user_data = ldap_conn.get_user(user, "mail")
+
+            if not user_data:
+                return JSONResponse(
+                    status_code=404,
+                    content={"detal": "User not found in Active Directory"}
+                )
+
+            return { "status": "success", "data": user_data }
+
+    except Exception as e:
+        logger.error(f"API error: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail":"Internal server error"}
+        )
 
 
 @app.get("/test/get_user")
