@@ -31,8 +31,7 @@ class UserRegistration(BaseModel):
             name_trans = translit(self.givenName, "ru", reversed=True)
             surname_trans = translit(self.sn, "ru", reversed=True)
             optname_trans = translit(self.optname, "ru", reversed=True)
-            return f"{surname_trans.lower()}_{name_trans[:1].
-                                        lower()}{optname_trans[:1].lower()}"
+            return f"{surname_trans.lower()}_{name_trans[:1].lower()}{optname_trans[:1].lower()}"
         except Exception as e:
             logger.error(f"Transliteration error: {e}")
             raise
