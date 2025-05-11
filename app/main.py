@@ -83,6 +83,7 @@ def get_test():
 @app.post("/get_user/mail")
 def get_user_mail(user: UserGetion):
     try:
+        logger.debug(f"Received request for user: {user.model_dump()}")  # Логируем входящие данные
         with LDAPService(ldap_config) as ldap_conn:
             user_data = ldap_conn.get_user(user)
 
@@ -95,7 +96,7 @@ def get_user_mail(user: UserGetion):
             return { "status": "success", "data": user_data }
 
     except Exception as e:
-        logger.error(f"API error: {str(e)}")
+        logger.error(f"API error: {str(e)}", exc_info=True)
         return JSONResponse(
             status_code=500,
             content={"detail":"Internal server error"}
