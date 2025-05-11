@@ -70,17 +70,12 @@ class UserRegistration(BaseModel):
 
 class UserGetion(BaseModel):
     sAMAccountName: str = Field(alias="login", description="Логин (например: login_ad)")
-    ou: str = Field(exclude=True, description="OU из Active Directory (например: ou=krd,ou=Проф ИТ,ou=Пользователи)")
-    domain: str = Field(exclude=True, description="Домен Active Directory (например: art-t.ru)")
-
-    @property
-    def dc(self):
-        parts = [part for part in self.domain.split('.') if part]
-        return "".join(f",dc={part.lower()}" for part in parts)[1:]
+    ou: str = Field(description="OU из Active Directory (например: ou=krd,ou=Проф ИТ,ou=Пользователи)")
+    domain: str = Field(description="Домен Active Directory (например: art-t.ru)")
 
     @property
     def dn(self):
-        return f"{self.ou},{self.dc}"
+        return f"{self.ou},dc={self.domain.replace('.', ',dc=')}"
 
 
 class UserEditor(BaseModel):
