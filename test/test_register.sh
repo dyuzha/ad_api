@@ -1,4 +1,4 @@
-curl -X POST "http://localhost:80/add_user" \
+curl -X POST "http://localhost:82/register" \
      -H "Content-Type: application/json" \
      -d '{
            "name": "Андрей",
