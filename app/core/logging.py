@@ -8,7 +8,7 @@ def setup_logging():
 
     logging.basicConfig(
         level=logging.DEBUG,
-        format="%(levelname)s - [UserManager] - %(asctime)s - %(name)s \
+        format="%(levelname)s - [AD API] - %(asctime)s - %(name)s \
         - %(message)s",
         handlers=[
             logging.FileHandler(f"logs/app_{datetime.now().strftime('%Y%m%d')}.log"),
