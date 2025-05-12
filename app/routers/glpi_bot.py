@@ -20,18 +20,20 @@ def get_user_mail(user: UserGetion):
             user_data = ldap_conn.get_user_info(user, "mail")
 
             if not user_data:
-                return HTTPException(
+                raise HTTPException(
                     status_code=404,
-                    detail={"User not found in Active Directory"}
+                    detail="User not found in Active Directory"
                 )
 
-            return {
+            response_data = {
                 "status": "success",
                     "data": {
                         "mail": user_data["mail"],
                         "login": user.sAMAccountName
                     }
             }
+            logger.debug(f"Returning response: {response_data}")
+            return response_data
 
     except HTTPException:
         # Пробрасываем уже обработанные HTTP исключения
@@ -41,8 +43,7 @@ def get_user_mail(user: UserGetion):
         logger.error(f"Error API: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail="Internal server error"
-        ) from e
+            detail="Internal server error") from e
 
 
 @router.get("/test/get_user")
