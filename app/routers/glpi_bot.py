@@ -1,6 +1,6 @@
 import logging
 from config.ldap_config import ldap_config
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from core.models import UserGetion
 from services.ldap_service import LDAPService
 from fastapi.responses import JSONResponse
@@ -12,26 +12,37 @@ router = APIRouter(prefix="", tags=["glpi_bot"])
 
 @router.post("/get_user/mail")
 def get_user_mail(user: UserGetion):
-    """Возвращает запись mail пользователя по логину"""
+    """Возвращает mail пользователя по логину"""
     try:
         logger.debug(f"Received request for user: {user.model_dump()}")
+
         with LDAPService(ldap_config) as ldap_conn:
             user_data = ldap_conn.get_user_info(user, "mail")
 
             if not user_data:
-                return JSONResponse(
+                return HTTPException(
                     status_code=404,
-                    content={"detal": "User not found in Active Directory"}
+                    detail={"User not found in Active Directory"}
                 )
 
-            return { "status": "success", "data": user_data }
+            return {
+                "status": "success",
+                    "data": {
+                        "mail": user_data["mail"],
+                        "login": user.sAMAccountName
+                    }
+            }
+
+    except HTTPException:
+        # Пробрасываем уже обработанные HTTP исключения
+        raise
 
     except Exception as e:
-        logger.error(f"API error: {str(e)}", exc_info=True)
-        return JSONResponse(
+        logger.error(f"Error API: {str(e)}", exc_info=True)
+        raise HTTPException(
             status_code=500,
-            content={"detail":"Internal server error"}
-        )
+            detail="Internal server error"
+        ) from e
 
 
 @router.get("/test/get_user")
