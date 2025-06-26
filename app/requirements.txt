@@ -1,7 +1,0 @@
-pyyaml
-transliterate
-ldap3
-fastapi
-uvicorn
-pydantic
-pydantic-settings

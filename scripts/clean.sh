@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Удаляем контейнер
-docker rm aac 2>/dev/null
-
-# Удаляем образ
-docker rmi ad_api 2>/dev/null
-
-echo "Очистка завершена"
+# Удаляем только контейнер (без удаления образа)
+docker rm -f aac 2>/dev/null
+echo "Контейнер aac удалён"

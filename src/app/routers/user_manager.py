@@ -1,8 +1,9 @@
 import logging
-from config.ldap_config import ldap_config
-from fastapi import APIRouter, HTTPException
-from core.models import UserRegistration
-from services.ldap_service import LDAPService
+from app.config import AppConfig
+from fastapi import APIRouter, Depends, HTTPException
+from app.core.models import UserRegistration
+from app.services.ldap_service import LDAPService
+from app.config.di import get_config
 from .depends import handle_ldap_errors
 
 
@@ -12,9 +13,9 @@ router = APIRouter(prefix="", tags=["user_manager"])
 
 @router.post("/register")
 @handle_ldap_errors
-async def register_user(user: UserRegistration):
+async def register_user(user: UserRegistration, app_config: AppConfig = Depends(get_config)):
     """Регистрирует нового пользователя"""
-    with LDAPService(ldap_config) as ldap_conn:
+    with LDAPService(app_config.ldap) as ldap_conn:
 
         # Создаем пользователя
         success = ldap_conn.reg_user(user=user)

@@ -1,24 +1,26 @@
 import logging
-from config.setting import settings
-from core.logging import setup_logging
+from app.config.di import get_config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import glpi_bot, user_manager
+from app.routers import glpi_bot, user_manager
+
+
+config = get_config()
 
 
 # Инициализация логирования
-setup_logging()
+config.logger.setup()
 logger = logging.getLogger(__name__)
 logger.info("Application started")
 
 
-app = FastAPI(title=settings.app_name)
+app = FastAPI(title=config.common.app_name)
 
 
 # Разрешение запросов
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=config.common.allowed_origins,
     allow_methods=["POST"],
     )
 

@@ -1,8 +1,9 @@
 import logging
-from config.ldap_config import ldap_config
-from fastapi import APIRouter, HTTPException
-from core.models import UserGetion
-from services.ldap_service import LDAPService
+from fastapi import APIRouter, Depends, HTTPException
+from app.config import AppConfig
+from app.config.di import get_config
+from app.core.models import UserGetion
+from app.services.ldap_service import LDAPService
 from fastapi.responses import JSONResponse
 
 
@@ -11,12 +12,12 @@ router = APIRouter(prefix="", tags=["glpi_bot"])
 
 
 @router.post("/get_user/mail")
-def get_user_mail(user: UserGetion):
+def get_user_mail(user: UserGetion, app_config: AppConfig = Depends(get_config)):
     """Возвращает mail пользователя по логину"""
     try:
         logger.debug(f"Received request for user: {user.model_dump()}")
 
-        with LDAPService(ldap_config) as ldap_conn:
+        with LDAPService(app_config.ldap) as ldap_conn:
             user_data = ldap_conn.get_user_info(user, "mail")
 
             if not user_data:

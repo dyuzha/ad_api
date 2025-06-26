@@ -3,18 +3,18 @@ from ldap3 import Server, Connection, ALL, MODIFY_REPLACE
 from ldap3.core.exceptions import LDAPException
 from typing import Optional, Type
 from types import TracebackType
-from config.ldap_config import LDAPConfig
-from core.models import UserRegistration, UserGetion
+from app.config import LDAPConfig
+from app.core.models import UserRegistration, UserGetion
 
 
 logger = logging.getLogger(__name__)
 
 
 class LDAPService:
-    """Класс для взаимодействия в Active Directory"""
-    def __init__(self, config: LDAPConfig):
+    """Класс для взаимодействия c Active Directory"""
+    def __init__(self, config: LDAPConfig, connection: Optional[Connection] = None):
         self.config = config
-        self.connection: Optional[Connection] = None
+        self.connection = connection
 
     def __enter__(self):
         try:
@@ -176,3 +176,19 @@ class LDAPService:
         except Exception as e:
             logger.error(f"Unexpected error: {e}")
             return False
+    #
+    #
+    # def connect(self):
+    #     if self.connection and not self.connection.closed:
+    #         return
+    #     server = Server(self.config.LDAP_SERVER_URL, get_info=ALL)
+    #     self.connection = Connection(
+    #         server,
+    #         user=self.config.get_admin_login(),
+    #         password=self.config.get_admin_password(),
+    #         auto_bind=True
+    #     )
+    #
+    # def close(self):
+    #     if self.connection and not self.connection.closed:
+    #         self.connection.unbind()

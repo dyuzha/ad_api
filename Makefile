@@ -1,4 +1,4 @@
-.PHONY: build run stop clean
+.PHONY: build run stop clean, clean-contain rebuild
 
 build:
 	@echo "Сборка Docker-образа..."
@@ -13,5 +13,12 @@ stop:
 	@./scripts/stop.sh
 
 clean: stop
-	@echo "Очистка..."
+	@echo "Удаление только контейнера"
 	@./scripts/clean.sh
+
+full-clean: stop
+	@echo "Полная очистка (контейнер + образ)..."
+	@./scripts/clean-full.sh
+
+
+rebuild: clean build run
