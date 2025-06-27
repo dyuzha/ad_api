@@ -1,8 +1,8 @@
 import logging
-from app.config.di import get_config
+from ad_api.config.di import get_config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import glpi_bot, user_manager
+from ad_api.routers import glpi_bot, user_manager
 
 
 config = get_config()

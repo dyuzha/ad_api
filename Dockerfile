@@ -21,7 +21,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 - && \
 # Устанавливаем плагин poetry
 RUN poetry self add poetry-plugin-export
 
-WORKDIR /src/app
+WORKDIR /src/ad_api
 
 # Сначала копируем только файлы зависимостей (Для кеширования)
 COPY ./pyproject.toml ./poetry.lock ./
@@ -38,13 +38,13 @@ LABEL maintainer="Dyuzhev Matvey"
 WORKDIR /src
 
 # Устанавливаем зависимости
-COPY --from=builder /src/app/requirements.txt .
+COPY --from=builder /src/ad_api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY .env ./..
 
 # Копируем остальные файлы приложения
-COPY ./src/app ./app
+COPY ./src/ad_api ./ad_api
 COPY ./src/main.py .
 
 COPY ./scripts/entrypoint.sh /entrypoint.sh

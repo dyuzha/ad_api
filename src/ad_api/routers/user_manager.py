@@ -1,9 +1,9 @@
 import logging
-from app.config import AppConfig
+from ad_api.config import AppConfig
 from fastapi import APIRouter, Depends, HTTPException
-from app.core.models import UserRegistration
-from app.services.ldap_service import LDAPService
-from app.config.di import get_config
+from ad_api.core.models import UserRegistration
+from ad_api.services.ldap_service import LDAPService
+from ad_api.config.di import get_config
 from .depends import handle_ldap_errors
 
 

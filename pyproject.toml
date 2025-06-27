@@ -32,3 +32,4 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 log_cli = true
 log_cli_level = "DEBUG"
+env_files = [".env.test"]
